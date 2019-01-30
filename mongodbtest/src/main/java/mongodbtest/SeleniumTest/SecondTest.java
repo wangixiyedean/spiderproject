@@ -9,6 +9,10 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,9 +26,10 @@ import java.util.List;
 public class SecondTest {
 
     private static String targetElement = "更多>>";
+    private static String driverAddress = "D:\\chromedriver.exe";
 
-    public static void main(String[] args) {
-        System.setProperty("webdriver.chrome.driver", "F:\\chromedriver.exe");
+    public static void main(String[] args) throws IOException {
+        System.setProperty("webdriver.chrome.driver", driverAddress);
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
@@ -42,15 +47,28 @@ public class SecondTest {
         urlList.add("http://xueshu.baidu.com/scholarID/CN-BX74XKFJ");
         urlList.add("http://xueshu.baidu.com/scholarID/CN-BO74QO5J");
 
+
+        File writePath = new File("D:\\test.txt");
+        writePath.createNewFile();
+        BufferedWriter out = new BufferedWriter(new FileWriter(writePath));
+        StringBuilder output = new StringBuilder();
+
         for (String url : urlList) {
-            function(driver, url, targetElement);
+            String unit = function(driver, url, targetElement);
+            output.append(unit);
         }
+        out.write(output.toString());
+        out.flush();
+        out.close();
 
         driver.quit();
     }
 
-    private static void function(WebDriver driver, String sourceUrl, String targetElement) {
-        System.out.println("====================================\n" + new Date(System.currentTimeMillis()));
+    private static String function(WebDriver driver, String sourceUrl, String targetElement) {
+        StringBuilder unit = new StringBuilder();
+        unit.append("========================================================================\r\n").
+                append(new Date(System.currentTimeMillis())).append("\r\n");
+//        System.out.println("====================================\n" + new Date(System.currentTimeMillis()));
         driver.navigate().to(sourceUrl);
         driver.findElement(By.linkText(targetElement)).click();
 
@@ -59,7 +77,6 @@ public class SecondTest {
             @NullableDecl
             @Override
             public WebElement apply(@NullableDecl WebDriver driver) {
-                assert driver != null;
                 return driver.findElement(By.xpath("//*[@id=\"co_rel_map\"]/h3"));
             }
         });
@@ -69,9 +86,12 @@ public class SecondTest {
             String name = webElement.getText().replace(" ", "");
             String paperCount = webElement.getAttribute("paper-count").replace(" ", "");
             String affiliate = webElement.getAttribute("affiliate").replace(" ", "");
-            System.out.println(name + " " + affiliate + " " + paperCount);
+            unit.append(name).append(" ").append(affiliate).append(" ").append(paperCount).append("\r\n");
+//            System.out.println(name + " " + affiliate + " " + paperCount);
         }
-        System.out.println(new Date(System.currentTimeMillis()) + "\n====================================");
+        unit.append(new Date(System.currentTimeMillis())).append("\r\n");
+//        System.out.println(new Date(System.currentTimeMillis()));
+        return unit.toString();
     }
 
 
